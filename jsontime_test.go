@@ -22,9 +22,15 @@ func TestUnmashalMsg(t *testing.T) {
 		"G": "XYZ"
 	}`
 
-	var zero time.Time
-	msg, err := ParseMsg(j)
+	var (
+		zero time.Time
+		msg  Msg
+	)
+
+	err := json.Unmarshal([]byte(j), &msg)
+
 	assert.True(t, errors.Is(err, jsontime.ErrUnknownTimeFormat))
+
 	assert.Equal(t, jsontime.Time(time.Unix(0, 123000000)), msg.A)
 	assert.Equal(t, jsontime.Time(time.Unix(0, 123000000)), msg.F)
 	p, _ := time.Parse("2006-01-02 15:04:05.000", "2020-03-18 10:51:54.198")
@@ -34,7 +40,6 @@ func TestUnmashalMsg(t *testing.T) {
 	assert.Equal(t, jsontime.Time(p), msg.D)
 	assert.Equal(t, jsontime.Time(p), msg.E)
 	assert.Equal(t, time.Time(msg.D).Format("20060102150405"), "20200318105154")
-
 }
 
 type Msg struct {
@@ -46,9 +51,4 @@ type Msg struct {
 	F jsontime.Time
 	D jsontime.Time `json:"d"`
 	G jsontime.Time
-}
-
-func ParseMsg(s string) (msg Msg, err error) {
-	err = json.Unmarshal([]byte(s), &msg)
-	return
 }
