@@ -28,11 +28,14 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	}
 
 	v = strings.ReplaceAll(v, ",", ".")
+	v = strings.ReplaceAll(v, "T", " ")
+	v = strings.ReplaceAll(v, "-", "")
+	v = strings.ReplaceAll(v, ":", "")
+	v = strings.TrimSuffix(v, "Z")
 
 	for _, f := range []string{
-		"2006-01-02T15:04:05.000000Z",
-		"2006-01-02T15:04:05.000",
-		"2006-01-02 15:04:05.000",
+		"20060102 150405.000000",
+		"20060102 150405.000",
 	} {
 		if tt, err := time.Parse(f, v); err == nil {
 			*t = Time(tt)
