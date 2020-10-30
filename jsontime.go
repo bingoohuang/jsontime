@@ -2,14 +2,15 @@ package jsontime
 
 import (
 	"errors"
-	perrors "github.com/pkg/errors"
 	"strconv"
 	"strings"
 	"time"
+
+	perrors "github.com/pkg/errors"
 )
 
 // ErrUnknownTimeFormat defines the error type for unknown time format.
-var ErrUnknownTimeFormat = errors.New("unkown errors time format")
+var ErrUnknownTimeFormat = errors.New("unknown errors time format")
 
 // Time defines a time.Time that can be used in struct tag for JSON unmarshalling.
 type Time time.Time
@@ -23,7 +24,7 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 
 	// 首先看是否是数字，表示毫秒数或者纳秒数
 	if p, err := strconv.ParseInt(v, 10, 64); err == nil {
-		*t = Time(ParseTime(p))
+		*t = Time(time.Unix(0, p*1000000)) // milliseconds range, 1 millis = 1000,000 nanos)
 		return nil
 	}
 
@@ -52,25 +53,4 @@ func TryUnQuoted(v string) (string, bool) {
 	}
 
 	return v[1 : vlen-1], true
-}
-
-// ParseTime tries to parse a int64 value to a time in this year by seconds, milliseconds,or  nanoseconds.
-func ParseTime(v int64) time.Time {
-	t := time.Now()
-	yearStart := time.Date(t.Year()-1, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
-	yearEnd := time.Date(t.Year()+1, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
-
-	if yearStart.Unix() <= v && v < yearEnd.Unix() {
-		return time.Unix(v, 0) // seconds range
-	}
-
-	if yearStart.Unix()*1000 <= v && v < yearEnd.Unix()*1000 {
-		return time.Unix(0, v*1000000) // milliseconds range, 1 millis = 1000,000 nanos
-	}
-
-	if yearStart.UnixNano() <= v && v < yearEnd.UnixNano() {
-		return time.Unix(0, v) // nanoseconds range
-	}
-
-	return time.Unix(v, 0)
 }
