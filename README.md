@@ -37,7 +37,7 @@ func main() {
 
 supporting time format:
 
-1. direct seconds/milliseconds/nanoseconds between now - 1 year and now + 1 year
+1. direct seconds/milliseconds/nanoseconds between now - 1 year and now + 1 year（整数的时间，是否在当前时间前后1年内的合法值（秒数/毫秒数/纳秒数，只处理前后1年的有效时间）
 1. string format of millis seconds
 1. string format of yyyy-MM-dd HH:mm:ss.SSS
 1. string format of yyyy-MM-dd HH:mm:ss,SSS

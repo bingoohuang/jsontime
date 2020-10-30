@@ -65,7 +65,7 @@ func ParseTime(v int64) time.Time {
 	}
 
 	if yearStart.Unix()*1000 <= v && v < yearEnd.Unix()*1000 {
-		return time.Unix(0, v*1000000) // milliseconds range
+		return time.Unix(0, v*1000000) // milliseconds range, 1 millis = 1000,000 nanos
 	}
 
 	if yearStart.UnixNano() <= v && v < yearEnd.UnixNano() {
