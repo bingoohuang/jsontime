@@ -21,9 +21,9 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	// 首先看是否是数字，表示毫秒数, 1milli=1000,000nano
+	// 首先看是否是数字，表示毫秒数或者纳秒数
 	if p, err := strconv.ParseInt(v, 10, 64); err == nil {
-		*t = Time(time.Unix(0, p*1000000))
+		*t = Time(ParseTime(p))
 		return nil
 	}
 
@@ -33,11 +33,8 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	v = strings.ReplaceAll(v, ":", "")
 	v = strings.TrimSuffix(v, "Z")
 
-	for _, f := range []string{
-		"20060102 150405.000000",
-		"20060102 150405.000",
-	} {
-		if tt, err := time.Parse(f, v); err == nil {
+	for _, f := range []string{"20060102 150405.000000", "20060102 150405.000"} {
+		if tt, err := time.ParseInLocation(f, v, time.Local); err == nil {
 			*t = Time(tt)
 			return nil
 		}
@@ -55,4 +52,25 @@ func TryUnQuoted(v string) (string, bool) {
 	}
 
 	return v[1 : vlen-1], true
+}
+
+// ParseTime tries to parse a int64 value to a time in this year by seconds, milliseconds,or  nanoseconds.
+func ParseTime(v int64) time.Time {
+	t := time.Now()
+	yearStart := time.Date(t.Year()-1, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
+	yearEnd := time.Date(t.Year()+1, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
+
+	if yearStart.Unix() <= v && v < yearEnd.Unix() {
+		return time.Unix(v, 0) // seconds range
+	}
+
+	if yearStart.Unix()*1000 <= v && v < yearEnd.Unix()*1000 {
+		return time.Unix(0, v*1000000) // milliseconds range
+	}
+
+	if yearStart.UnixNano() <= v && v < yearEnd.UnixNano() {
+		return time.Unix(0, v) // nanoseconds range
+	}
+
+	return time.Unix(v, 0)
 }

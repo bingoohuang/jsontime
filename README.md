@@ -1,24 +1,13 @@
 # jsontime
 
-json time parser
-
-Parsing time in JSON like 
-
-```json
-{
-    "O": "",
-    "A": "123",
-    "F": 123,
-    "B": "2020-03-18 10:51:54.198",
-    "C": "2020-03-18 10:51:54,198",
-    "E": "2020-03-18T10:51:54,198",
-    "d": "2020-03-18T10:51:54.198000Z"
-}
-```
-
-to relative go struct like
+Parsing time in JSON compatible with some common format.
 
 ```go
+import (
+	"encoding/json"
+	"github.com/bingoohuang/jsontime"
+)
+
 type Msg struct {
 	O jsontime.Time
 	A jsontime.Time
@@ -28,11 +17,27 @@ type Msg struct {
 	F jsontime.Time
 	D jsontime.Time `json:"d"`
 }
+
+func main() {
+	j := `{
+		"O": "",
+		"A": "1604022846",
+		"F": 1604022846000,
+		"B": "2020-03-18 10:51:54.198",
+		"C": "2020-03-18 10:51:54,198",
+		"E": "2020-03-18T10:51:54,198",
+		"d": "2020-03-18T10:51:54.198000Z",
+		"G": "XYZ"
+	}`
+
+    var msg Msg
+    err := json.Unmarshal([]byte(j), &msg)
+}
 ```
 
-supporing time format:
+supporting time format:
 
-1. direct milli seconds
+1. direct seconds/milliseconds/nanoseconds between now - 1 year and now + 1 year
 1. string format of millis seconds
 1. string format of yyyy-MM-dd HH:mm:ss.SSS
 1. string format of yyyy-MM-dd HH:mm:ss,SSS
