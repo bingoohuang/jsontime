@@ -1,6 +1,6 @@
 # jsontime
 
-Parsing time in JSON compatible with some common format.
+Parsing time in JSON compatible with some common format. (merge into github.com/bingoohuang/gg)
 
 ```go
 import (
